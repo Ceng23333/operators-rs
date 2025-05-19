@@ -12,8 +12,8 @@ infini-op = { git = "https://github.com/InfiniTensor/infini-toolkit", rev = "e83
 infini-ccl = { git = "https://github.com/InfiniTensor/infini-toolkit", rev = "e8362c3" }
 search-infini-tools = { git = "https://github.com/InfiniTensor/infini-toolkit", rev = "e8362c3" }
 
-cuda = { git = "https://github.com/Ceng23333/cuda-driver", rev = "cacd480" }
-cublas = { git = "https://github.com/Ceng23333/cuda-driver", rev = "cacd480" }
-nccl = { git = "https://github.com/Ceng23333/cuda-driver", rev = "cacd480" }
-search-cuda-tools = { git = "https://github.com/Ceng23333/cuda-driver", rev = "cacd480" }
-search-corex-tools = { git = "https://github.com/Ceng23333/cuda-driver", rev = "cacd480" }
+cuda = { git = "https://github.com/Ceng23333/cuda-driver", branch = "corex_support" }
+cublas = { git = "https://github.com/Ceng23333/cuda-driver", branch = "corex_support" }
+nccl = { git = "https://github.com/Ceng23333/cuda-driver", branch = "corex_support" }
+search-cuda-tools = { git = "https://github.com/Ceng23333/cuda-driver", branch = "corex_support" }
+search-corex-tools = { git = "https://github.com/Ceng23333/cuda-driver", branch = "corex_support" }
