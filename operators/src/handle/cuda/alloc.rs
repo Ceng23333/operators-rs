@@ -99,7 +99,7 @@ impl<'ctx> Alloc<DevMem<'ctx>> for &'ctx CurrentCtx {
     fn free(&self, _mem: DevMem<'ctx>) {}
 }
 
-#[cfg(use_nvidia)]
+#[cfg(any(use_nvidia, use_iluvatar))]
 impl<'ctx> Alloc<DevMem<'ctx>> for Stream<'ctx> {
     #[inline]
     fn alloc(&self, size: usize) -> DevMem<'ctx> {
