@@ -112,7 +112,7 @@ impl<'ctx> Alloc<DevMem<'ctx>> for Stream<'ctx> {
     }
 }
 
-#[cfg(use_nvidia)]
+#[cfg(any(use_nvidia, use_iluvatar))]
 impl<'ctx> QueueAlloc for Stream<'ctx> {
     type Hardware = Gpu;
     type DevMem = DevMem<'ctx>;
