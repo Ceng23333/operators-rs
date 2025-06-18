@@ -4,16 +4,16 @@ resolver = "3"
 package.edition = "2024"
 
 [workspace.dependencies]
-clrt = { git = "https://github.com/InfiniTensor/clrt", rev = "984ac7a" }
-search-cl-tools = { git = "https://github.com/InfiniTensor/clrt", rev = "984ac7a" }
+clrt.path = "../clrt/clrt"
+search-cl-tools.path = "../clrt/search-cl-tools"
 
-infini-rt = { git = "https://github.com/InfiniTensor/infini-toolkit", rev = "e8362c3" }
-infini-op = { git = "https://github.com/InfiniTensor/infini-toolkit", rev = "e8362c3" }
-infini-ccl = { git = "https://github.com/InfiniTensor/infini-toolkit", rev = "e8362c3" }
-search-infini-tools = { git = "https://github.com/InfiniTensor/infini-toolkit", rev = "e8362c3" }
+infini-rt = { path = "../infini-toolkit/infini-rt" }
+infini-op = { path = "../infini-toolkit/infini-op" }
+infini-ccl = { path = "../infini-toolkit/infini-ccl" }
+search-infini-tools = { path = "../infini-toolkit/search-infini-tools" }
 
-cuda = { git = "https://github.com/YdrMaster/cuda-driver", rev = "b0148c0" }
-cublas = { git = "https://github.com/YdrMaster/cuda-driver", rev = "b0148c0" }
-nccl = { git = "https://github.com/YdrMaster/cuda-driver", rev = "b0148c0" }
-search-cuda-tools = { git = "https://github.com/YdrMaster/cuda-driver", rev = "b0148c0" }
-search-corex-tools = { git = "https://github.com/YdrMaster/cuda-driver", rev = "b0148c0" }
+cuda = { path = "../cuda-driver/cuda" }
+cublas = { path = "../cuda-driver/cublas" }
+nccl = { path = "../cuda-driver/nccl" }
+search-cuda-tools = { path = "../cuda-driver/search-cuda-tools" }
+search-corex-tools = { path = "../cuda-driver/search-corex-tools" }
