@@ -12,9 +12,9 @@ infini-op = { git = "https://github.com/InfiniTensor/infini-toolkit", rev = "e83
 infini-ccl = { git = "https://github.com/InfiniTensor/infini-toolkit", rev = "e8362c3" }
 search-infini-tools = { git = "https://github.com/InfiniTensor/infini-toolkit", rev = "e8362c3" }
 
-cuda = { git = "https://github.com/Ceng23333/cuda-driver", rev = "8553da8" }
-cublas = { git = "https://github.com/Ceng23333/cuda-driver", rev = "8553da8" }
-nccl = { git = "https://github.com/Ceng23333/cuda-driver", rev = "8553da8" }
-search-cuda-tools = { git = "https://github.com/Ceng23333/cuda-driver", rev = "8553da8" }
-search-corex-tools = { git = "https://github.com/Ceng23333/cuda-driver", rev = "8553da8" }
-search-maca-tools = { git = "https://github.com/Ceng23333/cuda-driver", rev = "8553da8" }
+cuda = { git = "https://github.com/Ceng23333/cuda-driver", branch = "maca_dep" }
+cublas = { git = "https://github.com/Ceng23333/cuda-driver", branch = "maca_dep" }
+nccl = { git = "https://github.com/Ceng23333/cuda-driver", branch = "maca_dep" }
+search-cuda-tools = { git = "https://github.com/Ceng23333/cuda-driver", branch = "maca_dep" }
+search-corex-tools = { git = "https://github.com/Ceng23333/cuda-driver", branch = "maca_dep" }
+search-maca-tools = { git = "https://github.com/Ceng23333/cuda-driver", branch = "maca_dep" }
