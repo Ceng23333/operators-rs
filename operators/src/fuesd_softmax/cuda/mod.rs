@@ -84,11 +84,20 @@ impl crate::Operator for Operator {
                 &params.to_ptrs(),
                 queue.queue(),
             );
-        } else {
+        } else if att_len <= 16 * 1024 {
             let num_items_thread = att_len.div_ceil(block_size);
             let smem = (num_items_thread * block_size) as usize;
             scheme.module.launch(
                 &scheme.folding,
+                (grid_dims, block_size, smem * size_of::<c_float>()),
+                &params.to_ptrs(),
+                queue.queue(),
+            );
+        } else {
+            let num_items_thread = att_len.div_ceil(block_size);
+            let smem = (num_items_thread * block_size) as usize;
+            scheme.module.launch(
+                &scheme.global,
                 (grid_dims, block_size, smem * size_of::<c_float>()),
                 &params.to_ptrs(),
                 queue.queue(),
@@ -103,6 +112,7 @@ struct Scheme {
     max_threads_block: usize,
     padding: CString,
     folding: CString,
+    global: CString,
     module: Arc<ModuleBox>,
 }
 
@@ -120,6 +130,7 @@ impl Scheme {
         let cc = device.compute_capability();
         let padding = format!("fused_softmax_padding_{max_threads_block}");
         let folding = format!("fused_softmax_folding_{max_threads_block}");
+        let global = format!("fused_softmax_global_{max_threads_block}");
 
         let module = handle.compile_kernel(NAME, cc, || {
             format!(
@@ -146,6 +157,18 @@ extern "C" __global__ void {folding}(
     folding<{max_threads_block}>
     (att, {mask}(), att_len, stride_z, stride_y, stride_x);
 }}
+
+extern "C" __global__ void {global}(
+    half *__restrict__ att,
+    int const stride_z,
+    int const stride_y,
+    int const stride_x,
+
+    unsigned int const att_len
+){{
+    global<{max_threads_block}>
+    (att, {mask}(), att_len, stride_z, stride_y, stride_x);
+}}
 "#
             )
         });
@@ -153,6 +176,7 @@ extern "C" __global__ void {folding}(
             max_threads_block,
             padding: CString::new(padding).unwrap(),
             folding: CString::new(folding).unwrap(),
+            global: CString::new(global).unwrap(),
             module,
         }
     }

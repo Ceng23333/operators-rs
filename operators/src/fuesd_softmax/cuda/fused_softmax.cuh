@@ -122,6 +122,70 @@ static __device__ void block_folding(
     }
 }
 
+template <unsigned int BLOCK_SIZE, class Tdata, class Tmask>
+static __device__ void block_global(
+    Tdata *__restrict__ att,
+    Tmask mask,
+    unsigned int const tok_id,
+    unsigned int const seq_len,
+    unsigned int const att_len) {
+    // num items per thread
+    auto local = (att_len + blockDim.x - 1) / blockDim.x;
+    // shared memory for thread data
+    // local ↓ |<----blockDim.x---->|
+    //         | T0 | T1 | ... | TN |
+    //         | T0 | T1 | ... | TN |
+    // 每个线程纵向使用以避免 bank conflict
+    extern __shared__ float data_[];
+
+    auto thread_offset = threadIdx.x * local;
+    att += thread_offset;
+
+    float thread_max = -__FLT_MAX__;
+    for (unsigned int i = 0; i < local; ++i) {
+        auto att_idx = thread_offset + i;
+        if (att_idx < att_len && mask(tok_id, seq_len, att_idx, att_len)) {
+            thread_max = cub::Max()(thread_max, float(att[i]));
+        }
+    }
+
+    using BlockOp = cub::BlockReduce<float, BLOCK_SIZE>;
+    __shared__ typename BlockOp::TempStorage temp_storage;
+    auto block_op = BlockOp(temp_storage);
+
+    __shared__ float max;
+    {
+        auto acc = block_op.Reduce(thread_max, cub::Max());
+        if (threadIdx.x == 0) {
+            max = acc;
+        }
+    }
+    __syncthreads();
+
+    __shared__ float mean;
+    {
+        float thread_sum = 0;
+        for (unsigned int i = 0; i < local; ++i) {
+            auto att_idx = thread_offset + i;
+            if (att_idx < att_len && mask(tok_id, seq_len, att_idx, att_len)) {
+                thread_sum += expf(float(att[i]) - max);
+            }
+        }
+        auto acc = block_op.Sum(thread_sum);
+        if (threadIdx.x == 0) {
+            mean = fdividef(1, acc);
+        }
+    }
+    __syncthreads();
+
+    for (unsigned int i = 0; i < local; ++i) {
+        auto att_idx = thread_offset + i;
+        if (att_idx < att_len && mask(tok_id, seq_len, att_idx, att_len)) {
+            att[i] = Tdata(float(att[i]) * mean);
+        }
+    }
+}
+
 // assert BLOCK_SIZE >= blockDim.x
 template <unsigned int BLOCK_SIZE, class Tdata, class Tmask>
 static __forceinline__ __device__ void padding(
@@ -148,4 +212,18 @@ static __forceinline__ __device__ void folding(
          tok_id = blockIdx.x,
          seq_len = gridDim.x;
     block_folding<BLOCK_SIZE>(att + offset, mask, tok_id, seq_len, att_len);
+}
+
+template <unsigned int BLOCK_SIZE, class Tdata, class Tmask>
+static __forceinline__ __device__ void global(
+    Tdata *__restrict__ att,
+    Tmask mask,
+    unsigned int const att_len,
+    int const stride_z,
+    int const stride_y,
+    int const stride_x) {
+    auto offset = blockIdx.x * stride_x + blockIdx.y * stride_y + blockIdx.z * stride_z,
+         tok_id = blockIdx.x,
+         seq_len = gridDim.x;
+    block_global<BLOCK_SIZE>(att + offset, mask, tok_id, seq_len, att_len);
 }
